@@ -25,7 +25,7 @@ class DAQ_0DViewer_Picotechnology_PicologTC08(DAQ_Viewer_base):
                 {'title': 'Activated', 'name': 'activated', 'type': 'bool', 'value': False},
                 {'title': 'Ch name', 'name': 'ch_name', 'type': 'str', 'value': f'Channel {i}'},
             ]}
-            for i in range(1, 10)
+            for i in range(1, 9)
         ]},
     ]
 
@@ -39,8 +39,8 @@ class DAQ_0DViewer_Picotechnology_PicologTC08(DAQ_Viewer_base):
         if param.name() == 'device_serial_number':
             self.serial = param.value()
 
-        elif param.name().startswith('channel_'):
-            channel_num = int(param.name().split('_')[1])
+        elif param.name() == 'activated' and param.parent().name().startswith('channel_'):
+            channel_num = int(param.parent().name().split('_')[1])
             is_activated = param.value()
             if self.controller is not None:
                 if is_activated:
@@ -95,7 +95,7 @@ class DAQ_0DViewer_Picotechnology_PicologTC08(DAQ_Viewer_base):
                 if data_init:  # évite d'émettre une liste vide
                     self.dte_signal_temp.emit(DataToExport(
                         name='Temperature',
-                        data=[DataFromPlugins(name='TC08', data=data_init, dim='Data0D', labels=labels_init)]
+                        data=[DataFromPlugins(name='TC08', data=data_init, dim='Data0D', labels=labels_init, units='degC')]
                     ))
             except Exception as e:
                 import traceback
@@ -125,7 +125,8 @@ class DAQ_0DViewer_Picotechnology_PicologTC08(DAQ_Viewer_base):
                                           data=[DataFromPlugins(name='TC08',
                                                                 data=data_tot,
                                                                 dim='Data0D',
-                                                                labels=labels)]))
+                                                                labels=labels,
+                                                                units = 'degC')]))
 
     def stop(self):
         """Stop the current grab hardware wise if necessary"""
